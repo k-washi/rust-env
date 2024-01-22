@@ -12,17 +12,6 @@ RUN apt-get update -y && apt-get install -y build-essential vim \
     sudo wget curl git zip openssl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# rust install
-ENV RUST_HOME /usr/local/lib/rust
-ENV RUSTUP_HOME ${RUST_HOME}/rustup
-ENV CARGO_HOME ${RUST_HOME}/cargo
-RUN mkdir /usr/local/lib/rust && \
-    chmod 0755 $RUST_HOME
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > ${RUST_HOME}/rustup.sh \
-    && chmod +x ${RUST_HOME}/rustup.sh \
-    && ${RUST_HOME}/rustup.sh -y --default-toolchain nightly --no-modify-path
-ENV PATH $PATH:$CARGO_HOME/bin
-
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 RUN unzip awscliv2.zip
 RUN ./aws/install
@@ -44,4 +33,8 @@ RUN addgroup --gid ${gid} ${username} && \
 
 
 USER ${username}
+
+RUN curl https://sh.rustup.rs -sSf | \
+    sh -s -- --default-toolchain stable -y
+RUN sudo ln -s $HOME/.cargo/env /etc/profile.d/cargo_env.sh
 WORKDIR ${APPLICATION_DIRECTORY}
